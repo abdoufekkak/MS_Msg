@@ -1,4 +1,5 @@
-class message {
+
+export class message {
     constructor(
       public id: string,
       public senderId: number,
