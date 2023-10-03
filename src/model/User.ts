@@ -1,12 +1,12 @@
 import { message } from "./message";
 export class User {
   constructor(
-    public id: string,
     public username: string,
     public email: string,
     public friends: User[] = [],
     public bloquers: User[] = [],
-    public message: message[] = []
+    public message: message[] = [],
+    public id?: number,
   ) {}
 }
 
