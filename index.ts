@@ -1,8 +1,13 @@
 // Importer la bibliothèque Express avec la syntaxe ES modules
 const express =require('express');
+const client = require("./src/rote/UserRote.ts");
+// const cors = require("cors");
 
 // Créer une instance d'application Express
 const app = express();
+app.use(express.json());
+
+app.use("/api/client", client);
 
 // Définir une route pour la page d'accueil
 app.get('/', (req:any, res:any) => {

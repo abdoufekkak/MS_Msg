@@ -3,7 +3,7 @@ export class message {
     constructor(
       public senderId: number,
       public receiverId: number,
-      public content: string,
+      public contente: string,
       public send_date:Date,
       public contry_msg:string,
       public deleted_al:Date,

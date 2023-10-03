@@ -3,10 +3,10 @@ export class User {
   constructor(
     public username: string,
     public email: string,
-    public friends: User[] = [],
-    public bloquers: User[] = [],
-    public message: message[] = [],
+    public age:number,
+    public adress:string,
     public id?: number,
+    public message?: message[] ,
   ) {}
 }
 

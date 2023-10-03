@@ -9,7 +9,6 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 };
-
 const db = pgp(dbConfig);
 export class UserRepository {
     async createUser(user: User) {
@@ -23,19 +22,38 @@ export class UserRepository {
     
         return result.id;
       }
-
+      async GetAllUser() {
+        const insertQuery = `
+         select * from user order by id desc
+        `;
+    
+        const date=  await db.query(insertQuery);
+        return date;
+      }
 
       async getUserById(id: number) {
         const selectQuery = `
           SELECT * FROM users
           WHERE id = $[id]
         `;
+
+     
       
         const user = await db.oneOrNone(selectQuery, { id });
       
         return user;
       }
       
+      async  getAmisByIduser(id: number,){
+        const selectQuery = `
+        SELECT users2.id,users2.email,users2.username, users2.age
+         ,users2,address FROM users as users1,relations,users as  users2
+        WHERE   users1.id=relations.user_id and
+         users2.id=relations.friend_id and relations.type_relation='ami' and users1.id = $[id]
+      `;
+      const data=  await db.query(selectQuery,{ id: id });
+return data;
+      }
       async updateUser(id: number, updatedUserData: User) {
         const updateQuery = `
           UPDATE users
@@ -62,3 +80,4 @@ export class UserRepository {
       }
       
 }
+module.exports = new UserRepository();

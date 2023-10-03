@@ -16,15 +16,22 @@ class MessageDB {
   // Fonction pour insérer un message
   async createMessage(message : message) {
     const insertQuery = `
-      INSERT INTO message (senderId, receiverId, content, send_date, contry_msg, deleted_al, deleted_fr_me, messageType)
+      INSERT INTO message (senderId, receiverId, contente, send_date, contry_msg, deleted_al, deleted_fr_me, messageType)
       VALUES ($[senderId], $[receiverId], $[content], $[send_date], $[contry_msg], $[deleted_al], $[deleted_fr_me], $[messageType])
-      RETURNING id;
     `;
 
-    const result = await db.one(insertQuery, message);
-    return result.id;
+     message = await db.one(insertQuery, message);
+    return message;
   }
 
+  async GetAllmsg() {
+    const insertQuery = `
+     select * from message order by id desc
+    `;
+
+    const date=  await db.query(insertQuery);
+    return date;
+  }
   // Fonction pour récupérer un message par son ID
   async getMessageById(id : number) {
     const selectQuery = `
@@ -40,7 +47,7 @@ class MessageDB {
   async updateMessage(id: number, updatedMessage: message) {
     const updateQuery = `
       UPDATE message
-      SET senderId = $[senderId], receiverId = $[receiverId], content = $[content], 
+      SET senderId = $[senderId], receiverId = $[receiverId], content = $[contente], 
           send_date = $[send_date], contry_msg = $[contry_msg], deleted_al = $[deleted_al], 
           deleted_fr_me = $[deleted_fr_me], messageType = $[messageType]
       WHERE id = $[id]
@@ -53,10 +60,19 @@ class MessageDB {
     return result === 1;  }
 
   // Fonction pour supprimer un message par son ID
-  async deleteMessage(id: number) {
+  async deleteMessageAll(id: number) {
     const updateQuery = `
       UPDATE message
-      SET deleted_at = NOW()
+      SET deleted_al = NOW()
+      WHERE id = $1
+    `;
+
+    await db.none(updateQuery, id);
+  }
+  async deleteMessagemoi(id: number) {
+    const updateQuery = `
+      UPDATE message
+      SET deleted_fr_me = NOW()
       WHERE id = $1
     `;
 
