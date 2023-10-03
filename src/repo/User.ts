@@ -11,6 +11,7 @@ const dbConfig = {
 };
 const db = pgp(dbConfig);
 export class UserRepository {
+
     async createUser(user: User) {
         const insertQuery = `
           INSERT INTO users (username, email)
@@ -80,4 +81,3 @@ return data;
       }
       
 }
-module.exports = new UserRepository();
