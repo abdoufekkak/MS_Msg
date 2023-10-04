@@ -20,6 +20,6 @@ const port = 3000;
 const host = '192.168.0.7'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
 
 // Démarrer le serveur
-app.listen(port,host, () => {
+app.listen(port, () => {
   console.log(`Serveur Express en cours d'exécution sur le port ${port}`);
 });

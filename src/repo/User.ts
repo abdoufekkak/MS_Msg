@@ -25,11 +25,11 @@ export class UserRepository {
       }
       async GetAllUser() {
         const insertQuery = `
-         select * from user order by id desc
+         select * from users order by id desc
         `;
     
-        const date=  await db.query(insertQuery);
-        return date;
+        const datA=  await db.query(insertQuery);
+        return datA;
       }
 
       async getUserById(id: number) {

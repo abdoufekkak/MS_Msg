@@ -1,9 +1,10 @@
 import express  from "express";
 import { ServiceUser } from "../service/serviceUser"; 
 const router = express.Router();
-
-const serviceUser = new ServiceUser ()
-router.get("/",serviceUser.gettuser );
+import { UserRepository } from "../repo/User";
+const userRepository=new UserRepository()
+const serviceUser = new ServiceUser (userRepository)
+router.get("/",(req: any, res: any) => {serviceUser.users(req,res)});
 // router.post("/",repoclient.createUser );
 // router.post("/:id", );
 //  router.put("/:id", updateProduit);

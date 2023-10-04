@@ -1,6 +1,4 @@
-import { User } from "../model/User";
 import { UserRepository } from "../repo/User"; 
-
 const pgp = require('pg-promise')();
 require('dotenv').config(); 
 const dbConfig = {
@@ -13,10 +11,17 @@ const dbConfig = {
 const db = pgp(dbConfig);
 export class ServiceUser {
      repoclient = new UserRepository ()
-
-    async createUser(req: any,res:any) {
-      return req.status(200).send(this.repoclient.GetAllUser())
+constructor(repoclient:UserRepository){
+  this.repoclient=repoclient
+}
+      users(req:any,res:any) {
+    this.repoclient.GetAllUser().then(e=> {
+    return res.status(200).send(e)}
+       ).catch(err=>console.log("Qwert"))
+    
       }
-     
+    
+    
+    
       
 }
