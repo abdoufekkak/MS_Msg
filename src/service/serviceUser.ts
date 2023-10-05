@@ -1,6 +1,7 @@
-import { UserRepository } from "../repo/User"; 
-const pgp = require('pg-promise')();
-require('dotenv').config(); 
+import { UserRepository } from "../repo/User";
+import { User } from "../model/User";
+const pgp = require("pg-promise")();
+require("dotenv").config();
 const dbConfig = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -10,26 +11,28 @@ const dbConfig = {
 };
 const db = pgp(dbConfig);
 export class ServiceUser {
-     repoclient = new UserRepository ()
-constructor(repoclient:UserRepository){
-  this.repoclient=repoclient
-}
-      users(req:any,res:any) {
-    this.repoclient.GetAllUser().then(e=> {
-    return res.status(200).send(e)}
-       ).catch(err=>console.log("Qwert"))
-    
-      }
-    
-       supp(req:any,res:any){
-       }
-       update(req:any,res:any){
-        
-      }
-      save(req:any,res:any){
+  repoclient = new UserRepository();
+  constructor(repoclient: UserRepository) {
+    this.repoclient = repoclient;
+  }
+  users(req: any, res: any) {
+    this.repoclient
+      .GetAllUser()
+      .then((e) => {
+        return res.status(200).send(e);
+      })
+      .catch((err) => console.log("Qwert"));
+  }
 
-      }
-    
-    
-      
+  supp(req: any, res: any) {}
+  update(req: any, res: any) {}
+  save(req: any, res: any) {
+    const user = this.repoclient.getUserById(req.body.username )
+    this.repoclient
+      .createUser(req.body as User)
+      .then((e) => {
+        return res.status(200).send(e);
+      })
+      .catch((err) => console.log("Error in create User"));
+  }
 }
