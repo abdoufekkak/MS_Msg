@@ -14,15 +14,15 @@ const dbConfig = {
 const db = pgp(dbConfig);
 export class ServiceMessage {
   messageDB = new MessageDB();
-  repoclient = new UserRepository();
+  trepoclient = new UserRepository();
   constructor(repoclient: MessageDB) {
     this.messageDB = repoclient;
   }
   async save(req: any, res: any) {
-    const user2 = (await this.repoclient.getUserById(
+    const user2 = (await this.trepoclient.getUserById(
       req.body.receiverId
     )) as User;
-    const user1 = (await this.repoclient.getUserById(
+    const user1 = (await this.trepoclient.getUserById(
       req.body.senderId
     )) as User;
     if (user1 != null && user2 != null) {
@@ -52,10 +52,10 @@ export class ServiceMessage {
   async transfer_msg(req: any, res: any) {
     const { msg_id, usr_receiver } = req.body;
     const message = await this.messageDB.getMessageById(msg_id);
-    const user2 = (await this.repoclient.getUserById(
+    const user2 = (await this.trepoclient.getUserById(
       usr_receiver
     )) as User;
-    const user1 = (await this.repoclient.getUserById(
+    const user1 = (await this.trepoclient.getUserById(
       message.senderId
     )) as User;
     if (!user1 || !user2 || !message ) {
@@ -70,5 +70,58 @@ export class ServiceMessage {
          
       }
     
+  }
+  async suppparmoi(req: any, res: any) {
+    const postId = req.params.id;
+    try{
+        const result=await this.messageDB.deleteMessagemoi(postId);
+        if(result){
+            return  req.status(200).send(result);
+        }
+        else throw new Error("impossible");
+        
+
+    }catch(e){
+        return req.status(500).send(e);
+    }
+  }
+  async updatemssage(req:any,res:any){
+   try{
+    const msg:message=  req.body as message;
+  const user1=  this.trepoclient.getUserById(msg.senderId)
+  const user2 =this.trepoclient.getUserById(msg.receiverId)
+if(!user1 || !user2 ){
+    return req.status(500).send("usersnotfound")
+}
+req.params.id
+const mes =this.messageDB.getMessageById(req.params.id)
+if(!mes) return req.status(500).send("msg not found")
+
+const result=await this.messageDB.updateMessage(req.params.id,msg  )
+if(result){
+    return req.status.send(result)
+}else{
+    throw new Error("impossible");
+}
+   }catch(e){
+    return req.status(500).send(e)
+   }
+  }
+ async getmsgby2user(req:any,res:any){
+    try{
+        const msg:message=  req.body as message;
+        const user1=  this.trepoclient.getUserById(msg.senderId)
+        const user2 =this.trepoclient.getUserById(msg.receiverId)
+      if(!user1 || !user2 ){
+          return req.status(500).send("usersnotfound")
+      }
+   const data=   await this.messageDB.getAmisBy2user(msg.senderId,msg.receiverId)
+   return req.status(200).send(data)
+    }
+    catch(e){
+        return res.status(500).send("errer")
+    }
+   
+  
   }
 }
