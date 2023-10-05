@@ -12,6 +12,7 @@ const dbConfig = {
 const db = pgp(dbConfig);
 export class ServiceUser {
   repoclient = new UserRepository();
+
   constructor(repoclient: UserRepository) {
     this.repoclient = repoclient;
   }
@@ -37,8 +38,20 @@ export class ServiceUser {
     
         }
       
-  supp(req: any, res: any) {}
-  async update(req: any, res: any) {
+        async supp(req: any, res: any) {
+          const userId = req.params.id;
+      
+        try {
+          const rowCount = await this.repoclient.deleteUser(userId);
+      
+          if (rowCount ) {
+            return res.status(200).send("Utilisateur supprimé avec succès");
+          } 
+           
+        } catch (err) {
+           return res.status(500).send("Erreur ");
+        }
+      }  async update(req: any, res: any) {
     const postId = req.params.id;
     const user: User = req.body as User;
     const user2 = (await this.repoclient.getUserById(postId)) as User;
