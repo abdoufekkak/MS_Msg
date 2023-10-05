@@ -1,3 +1,4 @@
+import { User } from "../model/User";
 import { UserRepository } from "../repo/User"; 
 const pgp = require('pg-promise')();
 require('dotenv').config(); 
@@ -23,8 +24,16 @@ constructor(repoclient:UserRepository){
     
        supp(req:any,res:any){
        }
-       update(req:any,res:any){
-        
+     async  update(req:any,res:any){
+        const postId = req.params.id;
+        const user: User = req.body as User;
+    const user2= await  (this.repoclient.getUserById(postId)) as User;
+    if(user2!=null){
+      return res.status(500).send("this user existe")
+    }else{
+const  result= await this.repoclient.updateUser(postId,user)
+res.status(200).send(result)
+    }
       }
       save(req:any,res:any){
 
