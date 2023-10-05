@@ -38,7 +38,16 @@ res.status(200).send(result)
       save(req:any,res:any){
 
       }
+
+   async   getbyUsername(req:any,res:any){
+    const username = req.params.id;
+
+        const user2= await  (this.repoclient.getUserById(username)) as User;
+        if(user2!=null){
+          return res.status(500).send("this user existe")
+        }else{
+    res.status(200).send(user2)      }
     
-    
+        }
       
 }
