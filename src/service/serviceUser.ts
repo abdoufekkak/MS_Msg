@@ -21,6 +21,13 @@ constructor(repoclient:UserRepository){
     
       }
     
+       supp(req:any,res:any){
+       }
+       update(req:any,res:any){
+      }
+      save(req:any,res:any){
+        
+      }
     
     
       
