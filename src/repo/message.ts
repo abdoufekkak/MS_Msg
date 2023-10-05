@@ -76,8 +76,22 @@ export class MessageDB {
       WHERE id = $1
     `;
 
-    await db.none(updateQuery, id);
-  }
+ const result = await db.result(
+      updateQuery,
+      { id },
+      (r: { rowCount: any }) => r.rowCount
+    );
+    return result === 1;  }
+    
+  async  getAmisBy2user(idsender: number,idrecever:number){
+      const selectQuery = `
+      SELECT * FROM message
+WHERE (senderId = $1 AND receiverId = $2) OR (senderId = $2 AND receiverId = $1)
+ORDER BY send_date ASC;
+    `;
+    const data=  await db.query(selectQuery,{ idsender: idrecever });
+return data;
+    }
   async transferMessage(messageId: message, newReceiverId: number) {
   
   
