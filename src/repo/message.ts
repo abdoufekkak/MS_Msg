@@ -11,7 +11,7 @@ const dbConfig = {
 
 const db = pgp(dbConfig);
 
-class MessageDB {
+export class MessageDB {
  
   // Fonction pour insérer un message
   async createMessage(message : message) {
@@ -80,4 +80,3 @@ class MessageDB {
   }
 }
 
-module.exports = new MessageDB();
