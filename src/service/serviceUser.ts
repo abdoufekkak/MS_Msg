@@ -66,7 +66,7 @@ export class ServiceUser {
     try {
       const { age, adress } = req.body;
       
-      const results: [User] = await this.repoclient.filterUserByAgeAdress(age, adress);
+      const results: [User] = await this.repoclient.filterUsersByAgeAddress(age, adress);
       const count = results.length;
       return res.status(200).json({ results, count });
     } catch (error) {
