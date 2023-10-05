@@ -44,6 +44,18 @@ export class UserRepository {
       
         return user;
       }
+      async getUserByUsername(username: string) {
+        const selectQuery = `
+          SELECT * FROM users
+          WHERE username = $[username]
+        `;
+
+     
+      
+        const user = await db.oneOrNone(selectQuery, { username });
+      
+        return user;
+      }
       
       async  getAmisByIduser(id: number,){
         const selectQuery = `
