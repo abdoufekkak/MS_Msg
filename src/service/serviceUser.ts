@@ -1,4 +1,4 @@
-import { User } from "../model/User";
+import { User } from '../model/User';
 import { UserRepository } from "../repo/User";
 const pgp = require("pg-promise")();
 require("dotenv").config();
@@ -62,4 +62,16 @@ export class ServiceUser {
         .catch((err) => console.log("Error in create User"));
     }
   }
+  async Filter(req: any, res: any) {
+    try {
+      const { age, adress } = req.body;
+      
+      const results: [User] = await this.repoclient.filterUserByAgeAdress(age, adress);
+      const count = results.length;
+      return res.status(200).json({ results, count });
+    } catch (error) {
+      return res.status(500).send("Internal Server Error");
+    }
+  }
+  
 }
