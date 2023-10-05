@@ -57,7 +57,7 @@ export class UserRepository {
         return user;
       }
       
-      async  getAmisByIduser(id: number,){
+      async  getAmisByIduser(id: number){
         const selectQuery = `
         SELECT users2.id,users2.email,users2.username, users2.age
          ,users2,address FROM users as users1,relations,users as  users2
@@ -82,14 +82,38 @@ return data;
       }
       
       async deleteUser(id: number) {
-        const deleteQuery = `
-          DELETE FROM users
-          WHERE id = $[id]
+        const updateQuery = `
+        UPDATE users
+        SET deleted = NOW()
+        WHERE id = $1
+      `;
+
+    const result = await db.result(
+      updateQuery,
+      { id },
+      (r: { rowCount: any }) => r.rowCount
+    );
+    return result === 1;
+      }
+      async filterUsersByAgeAddress(age: number, address: string) {
+      let  touta = ``
+      const params=[]
+      if(age ){
+        touta+='AND age = $1'
+        params.push(age)
+      }
+      if(address){
+        touta+='AND address LIKE $2'
+        params.push(`%${address}%`)
+
+      }
+        const selectQuery = `
+          SELECT * FROM users
+          WHERE deleted is null   ${touta}
         `;
       
-        const result = await db.result(deleteQuery, { id }, (r: { rowCount: any; }) => r.rowCount);
-      
-        return result === 1;
-      }
+        const users = await db.query(selectQuery, params);
+
+        return users;}
       
 }

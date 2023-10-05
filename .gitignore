@@ -4,7 +4,7 @@ npm-debug.log
 .DS_Store
 
 # Ignorer les fichiers de configuration locaux
-# .env
+.env
 
 # Ignorer les fichiers de build
 dist/

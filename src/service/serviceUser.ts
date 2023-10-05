@@ -37,8 +37,19 @@ export class ServiceUser {
     
         }
       
-  supp(req: any, res: any) {}
-  async update(req: any, res: any) {
+        async supp(req: any, res: any) {
+          const userId = req.params.id;
+      
+        try {
+          const rowCount = await this.repoclient.deleteUser(userId);
+          if (rowCount) {
+            return res.status(200).send("Utilisateur supprimé avec succès");
+          } 
+         
+        } catch (err) {
+           return res.status(500).send("Erreur ");
+        }
+      }  async update(req: any, res: any) {
     const postId = req.params.id;
     const user: User = req.body as User;
     const user2 = (await this.repoclient.getUserById(postId)) as User;
@@ -50,7 +61,7 @@ export class ServiceUser {
     }
   }
   async save(req: any, res: any) {
-    const user = await this.repoclient.getUserByUsername(req.body.username);
+    const user:User = await this.repoclient.getUserByUsername(req.body.username) as User;
     if (user != null) {
       return res.status(500).send("this userName existe");
     } else {
@@ -61,5 +72,13 @@ export class ServiceUser {
         })
         .catch((err) => console.log("Error in create User"));
     }
+  }
+
+  async getAmisbyUsser(req: any, res: any) {
+    const postId:number = req.params.id;
+
+    const users = await this.repoclient.getAmisByIduser(postId) ;
+      return req.status.send(users)
+    
   }
 }
