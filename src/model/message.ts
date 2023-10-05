@@ -5,10 +5,10 @@ export class message {
       public receiverId: number,
       public contente: string,
       public send_date:Date,
-      public contry_msg:string,
-      public deleted_al:Date,
-      public deleted_fr_me:Date,
       public messageType: MessageType,
+      public contry_msg:string,
+      public deleted_al?:Date,
+      public deleted_fr_me?:Date,
       public id?: number,
     ) {}
   }

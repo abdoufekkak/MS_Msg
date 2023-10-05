@@ -78,5 +78,18 @@ export class MessageDB {
 
     await db.none(updateQuery, id);
   }
+  async transferMessage(messageId: message, newReceiverId: number) {
+  
+  
+    const updatedMessage = { ...message, receiverId: newReceiverId };
+  
+    const insertQuery = `
+      INSERT INTO message (senderId, receiverId, contente, send_date, contry_msg, deleted_al, deleted_fr_me, messageType)
+      VALUES ($[senderId], $[receiverId], $[content], $[send_date], $[contry_msg], $[deleted_al], $[deleted_fr_me], $[messageType])
+    `;
+  
+    return await db.none(insertQuery, updatedMessage);
+    }
+  
 }
 
