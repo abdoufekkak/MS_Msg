@@ -1,6 +1,7 @@
 import { message } from "../model/message";
-const pgp = require('pg-promise')();
-require('dotenv').config(); 
+import { generateUpdaters } from '../utils/setting';
+const pgp = require("pg-promise")();
+require("dotenv").config();
 const dbConfig = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -12,30 +13,31 @@ const dbConfig = {
 const db = pgp(dbConfig);
 
 export class MessageDB {
- 
   // Fonction pour insérer un message
-  async createMessage(message : message) {
+  async createMessage(message: message) {
     const insertQuery = `
-      INSERT INTO message (senderId, receiverId, contente, send_date, contry_msg, deleted_al, deleted_fr_me, messageType)
-      VALUES ($[senderId], $[receiverId], $[content], $[send_date], $[contry_msg], $[deleted_al], $[deleted_fr_me], $[messageType])
-    `;
+      INSERT INTO messages (sender_id, receiver_id, content, send_date, contry_msg, message_type)
+      VALUES ($[sender_id], $[receiver_id], $[content], NOW(), $[contry_msg], $[message_type])
+      RETURNING *
 
-     message = await db.one(insertQuery, message);
+      `;
+    message = await db.one(insertQuery, message);
+    console.log(message);
     return message;
   }
 
   async GetAllmsg() {
     const insertQuery = `
-     select * from message order by id desc
+     select * from messages order by id desc
     `;
 
-    const date=  await db.query(insertQuery);
+    const date = await db.query(insertQuery);
     return date;
   }
   // Fonction pour récupérer un message par son ID
-  async getMessageById(id : number) {
+  async getMessageById(id: number) {
     const selectQuery = `
-      SELECT * FROM message
+      SELECT * FROM messages
       WHERE id = $1
     `;
 
@@ -45,24 +47,28 @@ export class MessageDB {
 
   // Fonction pour mettre à jour un message par son ID
   async updateMessage(id: number, updatedMessage: message) {
+const updaters =  generateUpdaters(Object.keys(updatedMessage))
     const updateQuery = `
-      UPDATE message
-      SET senderId = $[senderId], receiverId = $[receiverId], content = $[contente], 
-          send_date = $[send_date], contry_msg = $[contry_msg], deleted_al = $[deleted_al], 
-          deleted_fr_me = $[deleted_fr_me], messageType = $[messageType]
+      UPDATE messages
+      SET ${updaters}
       WHERE id = $[id]
     `;
+      updatedMessage.id = id; // Ajoutez également l'ID aux données mises à jour
+      console.log('----',updaters,updatedMessage)
 
-    updatedMessage.id = id; // Ajoutez également l'ID aux données mises à jour
-
-    const result = await db.result(updateQuery, updatedMessage, (r: { rowCount: number }) => r.rowCount);
-    //number de ligne 
-    return result === 1;  }
+    console.log(updateQuery)
+    const result = await db.result(
+      updateQuery,
+      updatedMessage,
+      (r: { rowCount: number }) => r.rowCount
+    );
+    return result === 1;
+  }
 
   // Fonction pour supprimer un message par son ID
   async deleteMessageAll(id: number) {
     const updateQuery = `
-      UPDATE message
+      UPDATE messages
       SET deleted_al = NOW()
       WHERE id = $1
     `;
@@ -71,39 +77,31 @@ export class MessageDB {
   }
   async deleteMessagemoi(id: number) {
     const updateQuery = `
-      UPDATE message
+      UPDATE messages
       SET deleted_fr_me = NOW()
       WHERE id = $1
     `;
 
- const result = await db.result(
-      updateQuery,
-      { id },
-      (r: { rowCount: any }) => r.rowCount
-    );
-    return result === 1;  }
-    
-  async  getAmisBy2user(idsender: number,idrecever:number){
-      const selectQuery = `
-      SELECT * FROM message
-WHERE (senderId = $1 AND receiverId = $2) OR (senderId = $2 AND receiverId = $1)
-ORDER BY send_date ASC;
-    `;
-    const data=  await db.query(selectQuery,{ idsender: idrecever });
-return data;
-    }
-  async transferMessage(messageId: message, newReceiverId: number) {
-  
-  
-    const updatedMessage = { ...message, receiverId: newReceiverId };
-  
-    const insertQuery = `
-      INSERT INTO message (senderId, receiverId, contente, send_date, contry_msg, deleted_al, deleted_fr_me, messageType)
-      VALUES ($[senderId], $[receiverId], $[content], $[send_date], $[contry_msg], $[deleted_al], $[deleted_fr_me], $[messageType])
-    `;
-  
-    return await db.none(insertQuery, updatedMessage);
-    }
-  
-}
+    await db.none(updateQuery, id);
 
+  }
+
+  async getAmisBy2user(sender_id: number, receiver_id: number) {
+    const selectQuery = `
+      SELECT * FROM messages
+      WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
+      ORDER BY send_date ASC;
+    `;
+    const data = await db.query(selectQuery, [sender_id, receiver_id ]);
+    return data;
+  }
+  async transferMessage(messageId: message, newreceiver_id: number) {
+    const updatedMessage = { ...messageId, receiver_id: newreceiver_id };
+    const insertQuery = `
+      INSERT INTO messages (sender_id, receiver_id, content, send_date, contry_msg, deleted_al, deleted_fr_me, message_type)
+      VALUES ($[sender_id], $[receiver_id], $[content], $[send_date], $[contry_msg], $[deleted_al], $[deleted_fr_me], $[message_type])
+    `;
+
+    return await db.none(insertQuery, updatedMessage);
+  }
+}

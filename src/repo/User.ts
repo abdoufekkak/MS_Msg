@@ -1,7 +1,7 @@
 import { User } from "../model/User";
 
-const pgp = require('pg-promise')();
-require('dotenv').config(); 
+const pgp = require("pg-promise")();
+require("dotenv").config();
 const dbConfig = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -11,81 +11,80 @@ const dbConfig = {
 };
 const db = pgp(dbConfig);
 export class UserRepository {
-
-    async createUser(user: User) {
-        const insertQuery = `
-          INSERT INTO users (username, email)
-          VALUES ($[username], $[email])
-          RETURNING id
+  async createUser(user: User) {
+    const insertQuery = `
+          INSERT INTO users (username, email,age,address)
+          VALUES ($[username], $[email],$[age], $[address])
+          RETURNING *
         `;
-    
-        const result = await db.one(insertQuery, user);
-    
-        return result.id;
-      }
-      async GetAllUser() {
-        const insertQuery = `
+
+    const result = await db.one(insertQuery, user);
+
+    return result;
+  }
+  async GetAllUser() {
+    const insertQuery = `
          select * from users order by id desc
         `;
-    
-        const datA=  await db.query(insertQuery);
-        return datA;
-      }
+    const datA = await db.query(insertQuery);
+    return datA;
+  }
 
-      async getUserById(id: number) {
-        const selectQuery = `
+  async getUserById(id: number) {
+    const selectQuery = `
           SELECT * FROM users
-          WHERE id = $[id]
+          WHERE id = $[id] AND deleted is null
         `;
 
-     
-      
-        const user = await db.oneOrNone(selectQuery, { id });
-      
-        return user;
-      }
-      async getUserByUsername(username: string) {
-        const selectQuery = `
-          SELECT * FROM users
-          WHERE username = $[username]
-        `;
+    const user = await db.oneOrNone(selectQuery, { id });
 
-     
-      
-        const user = await db.oneOrNone(selectQuery, { username });
-      
-        return user;
-      }
-      
-      async  getAmisByIduser(id: number){
-        const selectQuery = `
+    return user;
+  }
+  async getUserByUsername(username: string) {
+    const selectQuery = `
+    SELECT * FROM users
+    WHERE username = $[username] AND deleted is null
+    `;
+    console.log(username)
+
+    const user = await db.oneOrNone(selectQuery, { username });
+
+    return user;
+  }
+
+  async getAmisByIduser(id: number) {
+    const selectQuery = `
         SELECT users2.id,users2.email,users2.username, users2.age
          ,users2,address FROM users as users1,relations,users as  users2
         WHERE   users1.id=relations.user_id and
          users2.id=relations.friend_id and relations.type_relation='ami' and users1.id = $[id]
       `;
-      const data=  await db.query(selectQuery,{ id: id });
-return data;
-      }
-      async updateUser(id: number, updatedUserData: User) {
-        const updateQuery = `
+    const data = await db.query(selectQuery, { id: id });
+    return data;
+  }
+  async updateUser(id: number, updatedUserData: User) {
+    const updateQuery = `
           UPDATE users
           SET username = $[username], email = $[email], age = $[age], address = $[address]
           WHERE id = $[id]
         `;
-      
-        updatedUserData.id = id; // Ajoutez également l'ID aux données mises à jour
-      
-        const result = await db.result(updateQuery, updatedUserData, (r: { rowCount: number }) => r.rowCount);
-        //number de ligne 
-        return result === 1;
-      }
-      
-      async deleteUser(id: number) {
-        const updateQuery = `
+
+    updatedUserData.id = id; // Ajoutez également l'ID aux données mises à jour
+
+    const result = await db.result(
+      updateQuery,
+      updatedUserData,
+      (r: { rowCount: number }) => r.rowCount
+    );
+    //number de ligne
+    return result === 1;
+  }
+
+  async deleteUser(id: number) {
+    const updateQuery = `
         UPDATE users
         SET deleted = NOW()
-        WHERE id = $1
+        WHERE id = $[id]
       `;
 
     const result = await db.result(
@@ -94,26 +93,29 @@ return data;
       (r: { rowCount: any }) => r.rowCount
     );
     return result === 1;
-      }
-      async filterUsersByAgeAddress(age: number, address: string) {
-      let  touta = ``
-      const params=[]
-      if(age ){
-        touta+='AND age = $1'
-        params.push(age)
-      }
-      if(address){
-        touta+='AND address LIKE $2'
-        params.push(`%${address}%`)
-
-      }
-        const selectQuery = `
+  }
+  async filterUsersByAgeAddress(age: number, address: string) {
+      let touta = ``;
+    const params = [];
+    if (age) {
+      touta += "AND age = $1";
+      params.push(age);
+    }
+    if (address && !age) {
+      touta += "AND address LIKE $1";
+      params.push(`%${address}%`);
+    }
+    if (address && age) {
+      touta += "AND address LIKE $2";
+      params.push(`%${address}%`);
+    }
+    const selectQuery = `
           SELECT * FROM users
           WHERE deleted is null   ${touta}
         `;
-      
-        const users = await db.query(selectQuery, params);
 
-        return users;}
-      
+    const users = await db.query(selectQuery, params);
+
+    return users;
+  }
 }

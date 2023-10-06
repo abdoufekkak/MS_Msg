@@ -1,5 +1,5 @@
- enum MessageType {
-    Text,
-    Audio,
-    video
-  }
+enum MessageType {
+  Text,
+  Audio,
+  video
+}
