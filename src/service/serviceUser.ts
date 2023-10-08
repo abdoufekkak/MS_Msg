@@ -85,7 +85,7 @@ export class ServiceUser {
   async Filter(req: any, res: any) {
     try {
       const { age, address } = req.body;
-      const results: [User] = await this.repoclient.filterUsersByAgeAddress(
+      const results: User[] = await this.repoclient.filterUsersByAgeAddress(
         age,
         address
       );
@@ -95,4 +95,17 @@ export class ServiceUser {
       return res.status(500).send(error);
     }
   }
+  async AmisById(req: any, res: any) {
+    try {
+      const id = req.params.id;
+      const results: User[] = await this.repoclient.getAmisByIduser(
+        id
+      );
+      const count = results.length;
+      return res.status(200).json(results);
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  }
+  
 }
