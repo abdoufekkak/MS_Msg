@@ -112,7 +112,7 @@ export class ServiceMessage {
   
   async getmsgby2user(req: any, res: any) {
     try {
-      const { sender_id, receiver_id } = req.body;
+      const { sender_id, receiver_id } = req.query;
       const user1 = await this.trepoclient.getUserById(sender_id);
       const user2 = await this.trepoclient.getUserById(receiver_id);
       if (!user1 || !user2) {
