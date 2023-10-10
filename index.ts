@@ -1,9 +1,9 @@
 // Importer la bibliothèque Express avec la syntaxe ES modules
 import  express  from "express";
+import cors from 'cors';
 const client = require("./src/rote/UserRote.ts");
 const message = require("./src/rote/MessageRoute.ts");
 import { Server as SocketServer } from 'socket.io';
-import cors from 'cors';
 // require('./globals'); // Importez le fichier globals.js pour initialiser la variable globale
 
 // const cors = require("cors");

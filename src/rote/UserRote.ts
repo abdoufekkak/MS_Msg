@@ -8,6 +8,9 @@ const serviceUser = new ServiceUser(userRepository);
 router.get("/", (req: any, res: any) => {
   serviceUser.users(req, res);
 });
+router.get('/amis/:id', async (req, res) => {
+  serviceUser.AmisById(req, res);
+});
 router.get('/filter', async (req, res) => {
   serviceUser.Filter(req, res);
 

@@ -55,9 +55,9 @@ export class UserRepository {
   async getAmisByIduser(id: number) {
     const selectQuery = `
         SELECT users2.id,users2.email,users2.username, users2.age
-         ,users2,address FROM users as users1,relations,users as  users2
-        WHERE   users1.id=relations.user_id and
-         users2.id=relations.friend_id and relations.type_relation='ami' and users1.id = $[id]
+         ,users2.address FROM users as users1,relation,users as  users2
+        WHERE   users1.id=relation.user_id and
+         users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id]
       `;
     const data = await db.query(selectQuery, { id: id });
     return data;
