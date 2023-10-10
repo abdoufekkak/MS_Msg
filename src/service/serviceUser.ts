@@ -108,4 +108,15 @@ export class ServiceUser {
     }
   }
   
+  async geIdbyUsername(req: any, res: any) {
+    const username = req.body.username;
+
+    const id = (await this.repoclient.getIdByUsername(username)) as User;
+    if (id == null) {
+      return res.status(500).send("this user not existe");
+    } else {
+
+      res.status(200).send(id);
+    }
+  }
 }

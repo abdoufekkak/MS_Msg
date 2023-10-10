@@ -33,5 +33,9 @@ router.delete("/:id", (req: any, res: any) => {
 router.put("/:id", (req: any, res: any) => {
   serviceUser.update(req, res);
 });
+router.post("/login", (req: any, res: any) => {
+  serviceUser.geIdbyUsername(req, res);
+});
+
 
 module.exports = router;

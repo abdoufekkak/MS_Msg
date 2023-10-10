@@ -40,25 +40,33 @@ export class UserRepository {
 
     return user;
   }
+  async getIdByUsername(username: string) {
+    const selectQuery = `
+    SELECT id FROM users
+    WHERE username = $[username] AND deleted is null
+    `;
+    const id = await db.oneOrNone(selectQuery, { username });
+    return id;
+  }
   async getUserByUsername(username: string) {
     const selectQuery = `
     SELECT * FROM users
     WHERE username = $[username] AND deleted is null
     `;
-    console.log(username)
 
     const user = await db.oneOrNone(selectQuery, { username });
 
     return user;
   }
-
   async getAmisByIduser(id: number) {
     const selectQuery = `
-        SELECT users2.id,users2.email,users2.username, users2.age
-         ,users2.address FROM users as users1,relation,users as  users2
-        WHERE   users1.id=relation.user_id and
-         users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id]
-      `;
+    SELECT users2.id,users2.email,users2.username, users2.age
+    ,users2.address FROM users as users1,relation,users as  users2
+   WHERE   users1.id=relation.user_id and
+    users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
+    ,users1.address FROM users as users1,relation,users as  users2
+   WHERE   users1.id=relation.user_id and
+    users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]`;
     const data = await db.query(selectQuery, { id: id });
     return data;
   }

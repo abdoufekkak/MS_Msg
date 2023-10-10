@@ -72,16 +72,17 @@ const io = new SocketServer(server, {
 
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
-  
+  console.log(22);
+
   socket.on("join chat", (userId) => {
     onlineUsers.set(userId, socket.id);
     console.log(onlineUsers);
 
   });
   socket.on("message", (data) => {
-    const sendUserSocket = onlineUsers.get(data.id);
+    const sendUserSocket = onlineUsers.get(data.receiver_id);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msgenvoyer", data.message);
+      socket.to(sendUserSocket).emit("msgenvoyer", data);
     }
   });
 });
