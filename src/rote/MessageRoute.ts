@@ -29,5 +29,4 @@ router.put("/:id", (req: any, res: any) => {
   serviceMessage.updatemssage(req, res);
 });
 
-
 module.exports = router;

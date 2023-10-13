@@ -89,7 +89,7 @@ const updaters =  generateUpdaters(Object.keys(updatedMessage))
   async getAmisBy2user(sender_id: number, receiver_id: number) {
     const selectQuery = `
       SELECT * FROM messages
-      WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
+      WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1) AND deleted_al is null
       ORDER BY send_date ASC;
     `;
     const data = await db.query(selectQuery, [sender_id, receiver_id ]);
