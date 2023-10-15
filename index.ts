@@ -6,7 +6,7 @@ const message = require("./src/rote/MessageRoute.ts");
 import { Server as SocketServer } from 'socket.io';
 import multer from "multer";
 // require('./globals'); // Importez le fichier globals.js pour initialiser la variable globale
-const host =  '10.0.0.139'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
+const host =  'localhost'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
 
 // const cors = require("cors");
 

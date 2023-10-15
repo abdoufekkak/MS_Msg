@@ -119,4 +119,17 @@ export class ServiceUser {
       res.status(200).send(id);
     }
   }
+
+  async getinvitation(req:any,res:any){
+
+    const iduser=req.params.id;
+    const user2 = (await this.repoclient.getUserById(iduser)) as User;
+    if (user2 == null) {
+      return res.status(500).send("this user not exist");
+  }
+const data=  await this.repoclient.getinvitation(iduser);
+res.status(200).send(data);
+
+}
+
 }

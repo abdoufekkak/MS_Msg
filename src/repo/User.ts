@@ -70,6 +70,16 @@ export class UserRepository {
     const data = await db.query(selectQuery, { id: id });
     return data;
   }
+
+  async getinvitation(id:number){
+    const  ff=`SELECT users2.id,users2.email,users2.username, users2.age
+    ,users2.address FROM relation,users as  users2
+   WHERE   
+    users2.id=relation.friend_id and relation.type_relation='ami'
+	and relation.user_id =$[id] and relation.is_accepted=false`
+  const data = await db.query(ff, { id: id });
+  return data;
+  }
   async updateUser(id: number, updatedUserData: User) {
     const updateQuery = `
           UPDATE users

@@ -19,6 +19,9 @@ router.get('/filter', async (req, res) => {
 router.get("/username/:username", (req: any, res: any) => {
   serviceUser.getbyUsername(req, res);
 });
+router.get("/invite/:id", (req: any, res: any) => {
+  serviceUser.getinvitation(req, res);
+});
 router.get("/:id", (req: any, res: any) => {
   serviceUser.getbyId(req, res);
 });
