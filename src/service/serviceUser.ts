@@ -44,7 +44,7 @@ export class ServiceUser {
       res.status(200).send(user2);
     }
   }
-  
+
   async supp(req: any, res: any) {
     const userId = req.params.id;
 
@@ -98,16 +98,14 @@ export class ServiceUser {
   async AmisById(req: any, res: any) {
     try {
       const id = req.params.id;
-      const results: User[] = await this.repoclient.getAmisByIduser(
-        id
-      );
+      const results: User[] = await this.repoclient.getAmisByIduser(id);
       const count = results.length;
       return res.status(200).json(results);
     } catch (error) {
       return res.status(500).send(error);
     }
   }
-  
+
   async geIdbyUsername(req: any, res: any) {
     const username = req.body.username;
 
@@ -115,7 +113,6 @@ export class ServiceUser {
     if (id == null) {
       return res.status(500).send("this user not existe");
     } else {
-
       res.status(200).send(id);
     }
   }
