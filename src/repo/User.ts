@@ -13,14 +13,14 @@ const db = pgp(dbConfig);
 export class UserRepository {
   async createUser(user: User) {
     const insertQuery = `
-          INSERT INTO users (username, email,status)
-          VALUES ($[username], $[email],$[status])
-          RETURNING id
+          INSERT INTO users (username, email,age,address,status)
+          VALUES ($[username], $[email],$[age], $[address],$[status])
+          RETURNING *
         `;
 
     const result = await db.one(insertQuery, user);
 
-    return result.id;
+    return result;
   }
   async GetAllUser() {
     const insertQuery = `
@@ -34,31 +34,40 @@ export class UserRepository {
   async getUserById(id: number) {
     const selectQuery = `
           SELECT * FROM users
-          WHERE id = $[id]
+          WHERE id = $[id] AND deleted is null
         `;
 
     const user = await db.oneOrNone(selectQuery, { id });
 
     return user;
   }
+  async getIdByUsername(username: string) {
+    const selectQuery = `
+    SELECT id FROM users
+    WHERE username = $[username] AND deleted is null
+    `;
+    const id = await db.oneOrNone(selectQuery, { username });
+    return id;
+  }
   async getUserByUsername(username: string) {
     const selectQuery = `
-          SELECT * FROM users
-          WHERE username = $[username]
-        `;
+    SELECT * FROM users
+    WHERE username = $[username] AND deleted is null
+    `;
 
     const user = await db.oneOrNone(selectQuery, { username });
 
     return user;
   }
-
   async getAmisByIduser(id: number) {
     const selectQuery = `
-        SELECT users2.id,users2.email,users2.username, users2.age
-         ,users2.address,users2.status FROM users as users1,relations,users as  users2
-        WHERE   users1.id=relations.user_id and
-         users2.id=relations.friend_id and relations.type_relation='ami' and users1.id = $[id]
-      `;
+    SELECT users2.id,users2.email,users2.username, users2.age
+    ,users2.address, users2.status FROM users as users1,relation,users as  users2
+   WHERE   users1.id=relation.user_id and
+    users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
+    ,users1.address ,users1.status FROM users as users1,relation,users as  users2
+   WHERE   users1.id=relation.user_id and
+    users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]`;
     const data = await db.query(selectQuery, { id: id });
     return data;
   }
@@ -84,7 +93,7 @@ export class UserRepository {
     const updateQuery = `
         UPDATE users
         SET deleted = NOW()
-        WHERE id = $1
+        WHERE id = $[id]
       `;
 
     const result = await db.result(
@@ -101,7 +110,11 @@ export class UserRepository {
       touta += "AND age = $1";
       params.push(age);
     }
-    if (address) {
+    if (address && !age) {
+      touta += "AND address LIKE $1";
+      params.push(`%${address}%`);
+    }
+    if (address && age) {
       touta += "AND address LIKE $2";
       params.push(`%${address}%`);
     }

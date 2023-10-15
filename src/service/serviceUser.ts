@@ -1,4 +1,4 @@
-import { User } from '../model/User';
+import { User } from "../model/User";
 import { UserRepository } from "../repo/User";
 const pgp = require("pg-promise")();
 require("dotenv").config();
@@ -12,7 +12,6 @@ const dbConfig = {
 const db = pgp(dbConfig);
 export class ServiceUser {
   repoclient = new UserRepository();
-
   constructor(repoclient: UserRepository) {
     this.repoclient = repoclient;
   }
@@ -22,41 +21,49 @@ export class ServiceUser {
       .then((e) => {
         return res.status(200).send(e);
       })
-      .catch((err) => console.log("Qwert"));
+      .catch((err) => console.log(err));
   }
 
-      
-
-   async   getbyUsername(req:any,res:any){
+  async getbyId(req: any, res: any) {
     const username = req.params.id;
 
-        const user2= await  (this.repoclient.getUserById(username)) as User;
-        if(user2!=null){
-          return res.status(500).send("this user existe")
-        }else{
-    res.status(200).send(user2)      }
-    
-        }
-      
-        async supp(req: any, res: any) {
-          const userId = req.params.id;
-      
-        try {
-          const rowCount = await this.repoclient.deleteUser(userId);
-      
-          if (rowCount ) {
-            return res.status(200).send("Utilisateur supprimé avec succès");
-          } 
-           
-        } catch (err) {
-           return res.status(500).send("Erreur ");
-        }
-      }  async update(req: any, res: any) {
+    const user2 = (await this.repoclient.getUserById(username)) as User;
+    if (user2 == null) {
+      return res.status(500).send("this user not existe");
+    } else {
+      res.status(200).send(user2);
+    }
+  }
+  async getbyUsername(req: any, res: any) {
+    const username = req.params.username;
+
+    const user2 = (await this.repoclient.getUserByUsername(username)) as User;
+    if (user2 == null) {
+      return res.status(500).send("this user not existe");
+    } else {
+      res.status(200).send(user2);
+    }
+  }
+  
+  async supp(req: any, res: any) {
+    const userId = req.params.id;
+
+    try {
+      const rowCount = await this.repoclient.deleteUser(userId);
+
+      if (rowCount) {
+        return res.status(200).send("Utilisateur supprimé avec succès");
+      }
+    } catch (err) {
+      return res.status(500).send(err);
+    }
+  }
+  async update(req: any, res: any) {
     const postId = req.params.id;
     const user: User = req.body as User;
     const user2 = (await this.repoclient.getUserById(postId)) as User;
-    if (user2 != null) {
-      return res.status(500).send("this user existe");
+    if (user2 == null) {
+      return res.status(500).send("this user not exist");
     } else {
       const result = await this.repoclient.updateUser(postId, user);
       res.status(200).send(result);
@@ -72,19 +79,44 @@ export class ServiceUser {
         .then((e) => {
           return res.status(200).send(e);
         })
-        .catch((err) => console.log("Error in create User"));
+        .catch((err) => console.log(err));
     }
   }
   async Filter(req: any, res: any) {
     try {
-      const { age, adress } = req.body;
-      
-      const results: [User] = await this.repoclient.filterUsersByAgeAddress(age, adress);
+      const { age, address } = req.body;
+      const results: User[] = await this.repoclient.filterUsersByAgeAddress(
+        age,
+        address
+      );
       const count = results.length;
       return res.status(200).json({ results, count });
     } catch (error) {
-      return res.status(500).send("Internal Server Error");
+      return res.status(500).send(error);
+    }
+  }
+  async AmisById(req: any, res: any) {
+    try {
+      const id = req.params.id;
+      const results: User[] = await this.repoclient.getAmisByIduser(
+        id
+      );
+      const count = results.length;
+      return res.status(200).json(results);
+    } catch (error) {
+      return res.status(500).send(error);
     }
   }
   
+  async geIdbyUsername(req: any, res: any) {
+    const username = req.body.username;
+
+    const id = (await this.repoclient.getIdByUsername(username)) as User;
+    if (id == null) {
+      return res.status(500).send("this user not existe");
+    } else {
+
+      res.status(200).send(id);
+    }
+  }
 }
