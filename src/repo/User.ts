@@ -13,8 +13,8 @@ const db = pgp(dbConfig);
 export class UserRepository {
   async createUser(user: User) {
     const insertQuery = `
-          INSERT INTO users (username, email,age,address)
-          VALUES ($[username], $[email],$[age], $[address])
+          INSERT INTO users (username, email,age,address,status)
+          VALUES ($[username], $[email],$[age], $[address],$[status])
           RETURNING *
         `;
 
@@ -26,6 +26,7 @@ export class UserRepository {
     const insertQuery = `
          select * from users order by id desc
         `;
+
     const datA = await db.query(insertQuery);
     return datA;
   }
@@ -61,10 +62,10 @@ export class UserRepository {
   async getAmisByIduser(id: number) {
     const selectQuery = `
     SELECT users2.id,users2.email,users2.username, users2.age
-    ,users2.address FROM users as users1,relation,users as  users2
+    ,users2.address, users2.status FROM users as users1,relation,users as  users2
    WHERE   users1.id=relation.user_id and
     users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
-    ,users1.address FROM users as users1,relation,users as  users2
+    ,users1.address ,users1.status FROM users as users1,relation,users as  users2
    WHERE   users1.id=relation.user_id and
     users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]`;
     const data = await db.query(selectQuery, { id: id });
@@ -73,7 +74,7 @@ export class UserRepository {
   async updateUser(id: number, updatedUserData: User) {
     const updateQuery = `
           UPDATE users
-          SET username = $[username], email = $[email], age = $[age], address = $[address]
+          SET username = $[username], email = $[email], age = $[age], address = $[address],status=$[status]
           WHERE id = $[id]
         `;
 
@@ -103,7 +104,7 @@ export class UserRepository {
     return result === 1;
   }
   async filterUsersByAgeAddress(age: number, address: string) {
-      let touta = ``;
+    let touta = ``;
     const params = [];
     if (age) {
       touta += "AND age = $1";
