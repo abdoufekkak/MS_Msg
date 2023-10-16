@@ -4,7 +4,7 @@ import cors from 'cors';
 const client = require("./src/rote/UserRote.ts");
 const message = require("./src/rote/MessageRoute.ts");
 import { Server as SocketServer } from 'socket.io';
-import multer from "multer";
+  import multer from "multer";
 // require('./globals'); // Importez le fichier globals.js pour initialiser la variable globale
 const host =  'localhost'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
 
@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + file.originalname);
   },
 });
+
 const storageImage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'images/');
@@ -42,6 +43,7 @@ const upload = multer({
 const uploade = multer({
   storage: storageImage,
 });
+
 app.post('/upload-image', uploade.single('imageFile'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'Aucun fichier image n\'a été envoyé.' });
@@ -71,6 +73,8 @@ app.use("/api/message", message);
 
 // Définir une route pour la page d'accueil
 app.use('/uploads', express.static("uploads"))
+app.use('/images', express.static("images"))
+app.use('/images/posts', express.static("posts"))
 
 
 // Définir le port sur lequel le serveur écoutera
@@ -145,6 +149,6 @@ io.on("connection", (socket) => {
     const sendUserSocket = onlineUsers.get(data.receiver_id);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msgenvoyer", data);
-    }
+    } 
   });
 });
