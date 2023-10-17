@@ -1,17 +1,58 @@
 // Importer la bibliothèque Express avec la syntaxe ES modules
-import  express  from "express";
+import  express, { NextFunction , Request, RequestHandler, Response } 
+from "express";
 import cors from 'cors';
 const client = require("./src/rote/UserRote.ts");
 const message = require("./src/rote/MessageRoute.ts");
 import { Server as SocketServer } from 'socket.io';
   import multer from "multer";
-// require('./globals'); // Importez le fichier globals.js pour initialiser la variable globale
-const host =  '10.0.0.139'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
+
+
+
+var admin = require("firebase-admin");
+var serviceAccount = require("./src/utils/chat-projet-ce77a-firebase-adminsdk-2d5j8-d2cb5b7d97.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+const app = express();
+
+// Middleware pour vérifier le jeton d'authentification Firebase
+const verifyFirebaseToken = (req: Request, res: Response, next: NextFunction) => {
+  const idToken = req.body?.idToken;
+
+  admin.auth().verifyIdToken(idToken)
+    .then((decodedToken :any) => {
+      // L'ID du compte utilisateur vérifié
+      const uid = decodedToken.uid;
+      const email = decodedToken.email;
+
+      // Vérifiez si l'adresse e-mail est celle que vous attendez
+      if (email === 'toumi10oussama@gmail.com') {
+        console.log(uid)
+        next(); // Autorisez l'accès à la route protégée
+      } else {
+        // Adresse e-mail ne correspondant pas
+        res.status(403).send('Accès refusé : Adresse e-mail non autorisée.');
+      }
+    })
+    .catch((error:any) => {
+      // Gestion des erreurs d'authentification
+      console.error(error);
+      res.status(401).send('Unauthorized');
+    });
+};
+
+// Utilisez ce middleware pour vérifier le jeton d'authentification avant d'accéder à certaines routes protégées
+app.use('/protected', verifyFirebaseToken as RequestHandler, (req: Request, res: Response) => {
+  // Votre code de gestion des routes protégées ici
+  res.status(200).send('Accès autorisé à la route protégée.');
+});
+const host =  'localhost'; // Adresse IP sur laquelle le serveur écoute (0.0.0.0 signifie toutes les adresses IP disponibles)
 
 // const cors = require("cors");
 
 // Créer une instance d'application Express
-const app = express();
 const corsOptions = {
   origin: `http://${host}:4200` // Remplacez par l'origine de votre application Angular
 };

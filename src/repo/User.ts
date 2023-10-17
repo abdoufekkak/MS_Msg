@@ -67,7 +67,8 @@ export class UserRepository {
     users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
     ,users1.address ,users1.status FROM users as users1,relation,users as  users2
    WHERE   users1.id=relation.user_id and
-    users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]`;
+    users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]
+    `;
     const data = await db.query(selectQuery, { id: id });
     return data;
   }
