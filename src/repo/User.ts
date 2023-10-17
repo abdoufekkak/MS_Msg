@@ -59,25 +59,62 @@ export class UserRepository {
 
     return user;
   }
+
+
+  async recherchinvit(id:number){
+    console.log(id)
+    const q=`select usertoutal.id from users as usertoutal where usertoutal.id!=$[id] EXCEPT 
+    (SELECT users2.id FROM users as users1,relation,users as  users2
+       WHERE   users1.id=relation.user_id and
+        users2.id=relation.friend_id and relation.type_relation='ami' 
+         and users1.id =$[id] union SELECT users1.id
+         FROM users as users1,relation,users as  users2
+       WHERE   users1.id=relation.user_id and
+        users2.id=relation.friend_id and relation.type_relation='ami'  and users2.id=$[id])`
+        const data = await db.query(q, { id: id });
+        const  dat:number[]= data.map((e:any)=>e.id)
+        console.log(dat)
+       const q2="select * from users where id = ANY($1)"
+     const data2=  await db.query(q2,  [dat]);
+        return data2;
+      }
   async getAmisByIduser(id: number) {
     const selectQuery = `
     SELECT users2.id,users2.email,users2.username, users2.age
     ,users2.address, users2.status FROM users as users1,relation,users as  users2
    WHERE   users1.id=relation.user_id and
-    users2.id=relation.friend_id and relation.type_relation='ami' and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
+    users2.id=relation.friend_id and relation.type_relation='ami' and is_accepted=true and users1.id = $[id] union SELECT users1.id,users1.email,users1.username, users1.age
     ,users1.address ,users1.status FROM users as users1,relation,users as  users2
    WHERE   users1.id=relation.user_id and
-    users2.id=relation.friend_id and relation.type_relation='ami' and users2.id=$[id]`;
+    users2.id=relation.friend_id and relation.type_relation='ami' and is_accepted=true and users2.id=$[id]`;
     const data = await db.query(selectQuery, { id: id });
-    return data;
-  }
 
+    return data;
+
+  }
+  async accepted_invit(user_id: number, friend_id: number) {
+    const query = `
+      UPDATE relation
+      SET is_accepted = true
+      WHERE user_id = $1 AND friend_id = $2
+    `;
+  
+    const data = await db.query(query, [user_id, friend_id]);
+  }
+  async deleted_invit(user_id: number, friend_id: number) {
+    const query = `
+    DELETE FROM relation
+    WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)    
+    `;
+  
+    const data = await db.query(query, [user_id, friend_id]);
+  }
   async getinvitation(id:number){
     const  ff=`SELECT users2.id,users2.email,users2.username, users2.age
     ,users2.address FROM relation,users as  users2
    WHERE   
-    users2.id=relation.friend_id and relation.type_relation='ami'
-	and relation.user_id =$[id] and relation.is_accepted=false`
+    users2.id=relation.user_id and relation.type_relation='ami'
+	and relation.friend_id =$[id] and relation.is_accepted=false`
   const data = await db.query(ff, { id: id });
   return data;
   }
@@ -137,4 +174,13 @@ export class UserRepository {
 
     return users;
   }
+  async envoyerinvite(relation:any){
+    const insertQuery = `
+          INSERT INTO relation (user_id, friend_id,type_relation,is_accepted)
+          VALUES ($[user_id], $[friend_id],$[type_relation], $[is_accepted])
+          RETURNING *
+        `;
+
+    const result = await db.one(insertQuery, relation); 
+  return result }
 }
