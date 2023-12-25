@@ -116,4 +116,47 @@ export class ServiceUser {
       res.status(200).send(id);
     }
   }
+
+  async getinvitation(req:any,res:any){
+
+    const iduser=req.params.id;
+    const user2 = (await this.repoclient.getUserById(iduser)) as User;
+    if (user2 == null) {
+      return res.status(500).send("this user not exist");
+  }
+const data=  await this.repoclient.getinvitation(iduser);
+res.status(200).send(data);
+
+}
+async accepted_invit(req:any,res:any){
+  console.log(req.body)
+const data=await this.repoclient.accepted_invit( req.body.user_id, req.body.friend_id);
+    return res.status(200).send({ok:"ok"});
+}
+
+async deleted_invit(req:any,res:any){
+  console.log(req.body)
+const data=await this.repoclient.deleted_invit( req.body.user_id, req.body.friend_id);
+    return res.status(200).send({ok:"ok"});
+}
+
+async getivn(req:any,res:any){
+  try{
+    const data=await this.repoclient.recherchinvit(req.params.id);
+return res.status(200).json(data)
+  }catch(e){
+    return res.status(500).json(e)
+  }
+}
+
+async envoyerinvite(req:any,res:any){
+  try{
+    const data=await this.repoclient.envoyerinvite(req.body);
+return res.status(200).json(data)
+  }catch(e){
+    console.log(e)
+    return res.status(500).json(e)
+
+  }
+}
 }

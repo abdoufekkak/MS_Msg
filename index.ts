@@ -192,4 +192,11 @@ io.on("connection", (socket) => {
       socket.to(sendUserSocket).emit("msgenvoyer", data);
     } 
   });
+  socket.on("video", (data) => {
+    console.log(data)
+    // const sendUserSocket = onlineUsers.get(data.receiver_id);
+    // if (sendUserSocket) {
+    //   socket.to(sendUserSocket).emit("msgenvoyer", data);
+    // }
+  });
 });
